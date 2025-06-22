@@ -204,4 +204,80 @@ router.patch("/:id/rol", authMiddleware, adminMiddleware, async (req, res) => {
   }
 })
 
+// Eliminar usuario (no puede eliminarse a sí mismo)
+
+router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
+  /**
+ * @swagger
+ * /api/usuarios/{id}:
+ *   delete:
+ *     summary: Eliminar usuario
+ *     description: Elimina un usuario por su ID. Un usuario no puede eliminarse a sí mismo.
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del usuario a eliminar
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: No puedes eliminarte a ti mismo
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error del servidor
+ */
+  try {
+    const { id } = req.params
+
+    // No permitir que un usuario se elimine a sí mismo
+    if (req.user.id === id) {
+      return res.status(400).json({
+        error: "No permitido",
+        message: "No puedes eliminarte a ti mismo",
+      })
+    }
+
+    // Verificar si el usuario existe
+    const result = await query(
+      "SELECT id FROM usuarios WHERE id = $1",
+      [id]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Usuario no encontrado",
+        message: "No existe un usuario con ese ID",
+      })
+    }
+
+    await query("DELETE FROM usuarios WHERE id = $1", [id])
+
+    res.json({
+      message: "Usuario eliminado exitosamente",
+    })
+  } catch (error) {
+    console.error("Error eliminando usuario:", error)
+    res.status(500).json({
+      error: "Error eliminando usuario",
+      message: "No se pudo eliminar el usuario",
+    })
+  }
+})
+
 module.exports = router

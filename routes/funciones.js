@@ -14,6 +14,31 @@ router.get("/", async (req, res) => {
     #swagger.summary = 'Listar todas las funciones'
   */
   try {
+    /**
+     * @swagger
+     * /api/funciones:
+     *   get:
+     *     summary: Listar todas las funciones
+     *     description: Recupera una lista de todas las funciones, incluyendo los datos del creador de cada función.
+     *     tags: [Funciones]
+     *     responses:
+     *       200:
+     *         description: Lista de funciones obtenida exitosamente
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 funciones:
+     *                   type: array
+     *                   items:
+     *                     $ref: '#/components/schemas/Funcion'
+     *                 total:
+     *                   type: integer
+     *                   example: 1
+     *       500:
+     *         description: Error del servidor
+     */
     const result = await query(`
       SELECT f.*, u.nombre as creador_nombre
       FROM funciones f
@@ -41,7 +66,7 @@ router.get("/", async (req, res) => {
 
 // Obtener funci��n por ID
 router.get("/:id", async (req, res) => {
-  /*
+ /*
     #swagger.tags = ['Funciones']
     #swagger.summary = 'Obtener función por ID'
     #swagger.parameters['id'] = {
@@ -51,6 +76,32 @@ router.get("/:id", async (req, res) => {
       type: 'string'
     }
   */
+  /**
+   * @swagger
+   * /api/funciones/{id}:
+   *   get:
+   *     summary: Obtener función por ID
+   *     description: Recupera los detalles de una función específica usando su ID.
+   *     tags: [Funciones]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: ID de la función a recuperar
+   *     responses:
+   *       200:
+   *         description: Función encontrada exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Funcion'
+   *       404:
+   *         description: Función no encontrada
+   *       500:
+   *         description: Error del servidor
+   */
   try {
     const { id } = req.params
 
@@ -90,13 +141,59 @@ router.post(
   upload.single("imagen"),
   validate(schemas.funcion),
   async (req, res) => {
-    /*
-    #swagger.tags = ['Funciones']
-    #swagger.summary = 'Crear nueva función'
-    #swagger.description = 'Solo accesible para administradores'
-    #swagger.security = [{ "bearerAuth": [] }]
-    #swagger.consumes = ['multipart/form-data']
-  */
+    /**
+     * @swagger
+     * /api/funciones:
+     *   post:
+     *     summary: Crear nueva función
+     *     description: Solo accesible para administradores
+     *     tags: [Funciones]
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - titulo
+     *               - fecha
+     *             properties:
+     *               titulo:
+     *                 type: string
+     *                 example: Obra de teatro
+     *               descripcion:
+     *                 type: string
+     *                 example: Descripción de la función
+     *               fecha:
+     *                 type: string
+     *                 format: date-time
+     *                 example: 2024-12-31T18:00:00Z
+     *               imagen:
+     *                 type: string
+     *                 format: binary
+     *     responses:
+     *       201:
+     *         description: Función creada exitosamente
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                 funcion:
+     *                   $ref: '#/components/schemas/Funcion'
+     *       400:
+     *         description: Datos inválidos
+     *       401:
+     *         description: No autenticado
+     *       403:
+     *         description: No autorizado
+     *       500:
+     *         description: Error del servidor
+     */
     try {
       const { titulo, descripcion, fecha } = req.body
       const imagen_url = req.file ? req.file.filename : null
@@ -129,11 +226,65 @@ router.post(
 
 // Actualizar función (solo admin)
 router.put("/:id", authMiddleware, adminMiddleware, upload.single("imagen"), async (req, res) => {
-  /*
-    #swagger.tags = ['Funciones']
-    #swagger.summary = 'Actualizar función'
-    #swagger.security = [{ "bearerAuth": [] }]
-  */
+  /**
+   * @swagger
+   * /api/funciones/{id}:
+   *   put:
+   *     summary: Actualizar función
+   *     description: Solo accesible para administradores
+   *     tags: [Funciones]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: ID de la función
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               titulo:
+   *                 type: string
+   *                 example: Nueva función
+   *               descripcion:
+   *                 type: string
+   *                 example: Descripción actualizada
+   *               fecha:
+   *                 type: string
+   *                 format: date-time
+   *                 example: 2024-12-31T18:00:00Z
+   *               imagen:
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: Función actualizada exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 funcion:
+   *                   $ref: '#/components/schemas/Funcion'
+   *       400:
+   *         description: Datos inválidos
+   *       401:
+   *         description: No autenticado
+   *       403:
+   *         description: No autorizado
+   *       404:
+   *         description: Función no encontrada
+   *       500:
+   *         description: Error del servidor
+   */
   try {
     const { id } = req.params
     const { titulo, descripcion, fecha } = req.body
@@ -184,11 +335,41 @@ router.put("/:id", authMiddleware, adminMiddleware, upload.single("imagen"), asy
 
 // Eliminar función (solo admin)
 router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
-  /*
-    #swagger.tags = ['Funciones']
-    #swagger.summary = 'Eliminar función'
-    #swagger.security = [{ "bearerAuth": [] }]
-  */
+  /**
+   * @swagger
+   * /api/funciones/{id}:
+   *   delete:
+   *     summary: Eliminar función
+   *     description: Solo accesible para administradores
+   *     tags: [Funciones]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: ID de la función
+   *     responses:
+   *       200:
+   *         description: Función eliminada exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *       401:
+   *         description: No autenticado
+   *       403:
+   *         description: No autorizado
+   *       404:
+   *         description: Función no encontrada
+   *       500:
+   *         description: Error del servidor
+   */
   try {
     const { id } = req.params
 

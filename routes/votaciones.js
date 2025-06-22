@@ -8,10 +8,7 @@ const router = express.Router()
 
 // Listar todas las votaciones
 router.get("/", async (req, res) => {
-  /*
-    #swagger.tags = ['Votaciones']
-    #swagger.summary = 'Listar todas las votaciones'
-  */
+
   try {
     const result = await query(`
       SELECT v.*, u.nombre as creador_nombre

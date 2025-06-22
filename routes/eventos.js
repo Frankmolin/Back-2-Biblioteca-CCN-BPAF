@@ -224,20 +224,67 @@ router.post(
   },
 )
 
-// Actualizar evento (solo admin)
 router.put("/:id", authMiddleware, adminMiddleware, upload.single("imagen"), async (req, res) => {
-  /*
-    #swagger.tags = ['Eventos']
-    #swagger.summary = 'Actualizar evento'
-    #swagger.description = 'Solo accesible para administradores'
-    #swagger.security = [{ "bearerAuth": [] }]
-    #swagger.parameters['id'] = {
-      in: 'path',
-      description: 'ID del evento',
-      required: true,
-      type: 'string'
-    }
-  */
+  /**
+   * @swagger
+   * /api/eventos/{id}:
+   *   put:
+   *     summary: Actualizar evento
+   *     description: Solo accesible para administradores
+   *     tags: [Eventos]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: ID del evento
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               titulo:
+   *                 type: string
+   *                 example: Nuevo Título
+   *               descripcion:
+   *                 type: string
+   *                 example: Descripción actualizada
+   *               fecha:
+   *                 type: string
+   *                 format: date-time
+   *                 example: 2024-12-31T18:00:00Z
+   *               imagen:
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: Evento actualizado exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 evento:
+   *                   $ref: '#/components/schemas/Evento'
+   *       400:
+   *         description: Datos inválidos
+   *       401:
+   *         description: No autenticado
+   *       403:
+   *         description: No autorizado
+   *       404:
+   *         description: Evento no encontrado
+   *       500:
+   *         description: Error del servidor
+   */
   try {
     const { id } = req.params
     const { titulo, descripcion, fecha } = req.body
@@ -288,20 +335,44 @@ router.put("/:id", authMiddleware, adminMiddleware, upload.single("imagen"), asy
   }
 })
 
-// Eliminar evento (solo admin)
+
 router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
-  /*
-    #swagger.tags = ['Eventos']
-    #swagger.summary = 'Eliminar evento'
-    #swagger.description = 'Solo accesible para administradores'
-    #swagger.security = [{ "bearerAuth": [] }]
-    #swagger.parameters['id'] = {
-      in: 'path',
-      description: 'ID del evento',
-      required: true,
-      type: 'string'
-    }
-  */
+  /**
+   * @swagger
+   * /api/eventos/{id}:
+   *   delete:
+   *     summary: Eliminar evento
+   *     description: Solo accesible para administradores
+   *     tags: [Eventos]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: ID del evento
+   *     responses:
+   *       200:
+   *         description: Evento eliminado exitosamente
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *       401:
+   *         description: No autenticado
+   *       403:
+   *         description: No autorizado
+   *       404:
+   *         description: Evento no encontrado
+   *       500:
+   *         description: Error del servidor
+   */
   try {
     const { id } = req.params
 
