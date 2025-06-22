@@ -14,20 +14,31 @@ const eventosRoutes = require("./routes/eventos")
 const funcionesRoutes = require("./routes/funciones")
 const votacionesRoutes = require("./routes/votaciones")
 const librosRoutes = require("./routes/libros")
-const bcrypt = require("bcryptjs")
+
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
 // Middlewares globales
-app.use(helmet())
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(cors())
 app.use(express.json({ limit: "10mb" }))
 app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
-// Servir archivos estáticos (imágenes subidas)
-app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+  },
+  express.static(path.join(__dirname, "uploads"))
+);
 // Documentación Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs))
 

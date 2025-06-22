@@ -6,7 +6,30 @@ const { validate, schemas } = require("../utils/validation")
 
 const router = express.Router()
 
-// Listar todas las votaciones
+/**
+ * @swagger
+ * /api/votaciones:
+ *   get:
+ *     summary: Listar todas las votaciones
+ *     description: Obtiene la lista de todas las votaciones
+ *     tags: [Votaciones]
+ *     responses:
+ *       200:
+ *         description: Lista de votaciones
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 votaciones:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Votacion'
+ *                 total:
+ *                   type: integer
+ *       500:
+ *         description: Error del servidor
+ */
 router.get("/", async (req, res) => {
 
   try {
@@ -30,7 +53,39 @@ router.get("/", async (req, res) => {
   }
 })
 
-// Obtener votación por ID con resultados
+/**
+ * @swagger
+ * /api/votaciones/{id}:
+ *   get:
+ *     summary: Obtener votación por ID con resultados
+ *     description: Devuelve la información de una votación y sus resultados
+ *     tags: [Votaciones]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la votación
+ *     responses:
+ *       200:
+ *         description: Detalle de la votación y resultados
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 votacion:
+ *                   $ref: '#/components/schemas/Votacion'
+ *                 resultados:
+ *                   type: object
+ *                 total_votos:
+ *                   type: integer
+ *       404:
+ *         description: Votación no encontrada
+ *       500:
+ *         description: Error del servidor
+ */
 router.get("/:id", async (req, res) => {
   /*
     #swagger.tags = ['Votaciones']
@@ -80,7 +135,62 @@ router.get("/:id", async (req, res) => {
   }
 })
 
-// Crear nueva votación (solo admin)
+/**
+ * @swagger
+ * /api/votaciones:
+ *   post:
+ *     summary: Crear nueva votación
+ *     description: Crea una nueva votación (solo administradores)
+ *     tags: [Votaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - titulo
+ *               - opciones
+ *               - fecha_fin
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *                 example: Mejor Libro del Año
+ *               descripcion:
+ *                 type: string
+ *                 example: Votación para elegir el mejor libro
+ *               opciones:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Opción 1", "Opción 2", "Opción 3"]
+ *               fecha_fin:
+ *                 type: string
+ *                 format: date-time
+ *                 example: 2024-12-31T23:59:59Z
+ *     responses:
+ *       201:
+ *         description: Votación creada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 votacion:
+ *                   $ref: '#/components/schemas/Votacion'
+ *       400:
+ *         description: Datos inválidos
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No autorizado
+ *       500:
+ *         description: Error del servidor
+ */
 router.post("/", authMiddleware, adminMiddleware, validate(schemas.votacion), async (req, res) => {
   /*
     #swagger.tags = ['Votaciones']
@@ -124,7 +234,63 @@ router.post("/", authMiddleware, adminMiddleware, validate(schemas.votacion), as
   }
 })
 
-// Votar en una votación
+/**
+ * @swagger
+ * /api/votaciones/{id}/votar:
+ *   post:
+ *     summary: Votar en una votación
+ *     description: Permite a un usuario autenticado votar en una votación activa
+ *     tags: [Votaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la votación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - opcion
+ *             properties:
+ *               opcion:
+ *                 type: string
+ *                 example: Opción 1
+ *     responses:
+ *       201:
+ *         description: Voto registrado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 voto:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     opcion:
+ *                       type: string
+ *                     fecha:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Datos inválidos o ya votaste
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Votación no encontrada
+ *       500:
+ *         description: Error del servidor
+ */
 router.post("/:id/votar", authMiddleware, async (req, res) => {
   /*
     #swagger.tags = ['Votaciones']
@@ -244,7 +410,59 @@ router.post("/:id/votar", authMiddleware, async (req, res) => {
   }
 })
 
-// Actualizar votación (solo admin)
+/**
+ * @swagger
+ * /api/votaciones/{id}:
+ *   put:
+ *     summary: Actualizar votación
+ *     description: Actualiza los datos de una votación (solo administradores)
+ *     tags: [Votaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la votación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *               descripcion:
+ *                 type: string
+ *               fecha_fin:
+ *                 type: string
+ *                 format: date-time
+ *               activa:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Votación actualizada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 votacion:
+ *                   $ref: '#/components/schemas/Votacion'
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No autorizado
+ *       404:
+ *         description: Votación no encontrada
+ *       500:
+ *         description: Error del servidor
+ */
 router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   /*
     #swagger.tags = ['Votaciones']
@@ -283,7 +501,41 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   }
 })
 
-// Eliminar votación (solo admin)
+/**
+ * @swagger
+ * /api/votaciones/{id}:
+ *   delete:
+ *     summary: Eliminar votación
+ *     description: Elimina una votación y sus votos relacionados (solo administradores)
+ *     tags: [Votaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la votación
+ *     responses:
+ *       200:
+ *         description: Votación eliminada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: No autenticado
+ *       403:
+ *         description: No autorizado
+ *       404:
+ *         description: Votación no encontrada
+ *       500:
+ *         description: Error del servidor
+ */
 router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   /*
     #swagger.tags = ['Votaciones']
