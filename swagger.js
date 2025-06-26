@@ -2,7 +2,8 @@ const swaggerJsdoc = require("swagger-jsdoc")
 
 require("dotenv").config()
 
-const PORT = process.env.PORT || 3001
+const URL = process.env.URL_BACK || 3001 ||`http://localhost:3001` 
+
 
 const options = {
   definition: {
