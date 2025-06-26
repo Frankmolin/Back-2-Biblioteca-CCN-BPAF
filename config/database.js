@@ -4,12 +4,13 @@ require("dotenv").config();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // requerido para SSL externo como Neon
+    rejectUnauthorized: false, // 💡 Necesario para Neon
   },
-  max: 20,
+  connectionTimeoutMillis: 8000, // ⏱️ subimos el tiempo
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  max: 20,
 });
+
 
 // Función para ejecutar queries
 const query = async (text, params) => {
