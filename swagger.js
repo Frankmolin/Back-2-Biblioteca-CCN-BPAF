@@ -19,7 +19,7 @@ const options = {
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
+        url: URL,
         description: "Servidor de desarrollo",
       },
     ],
