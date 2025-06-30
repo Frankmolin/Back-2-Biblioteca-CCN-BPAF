@@ -22,72 +22,47 @@ Backend completo para sistema de gestión de biblioteca desarrollado con Node.js
 ## 🛠️ Instalación
 
 1. **Clonar el repositorio**
-\`\`\`bash
-git clone <tu-repositorio>
-cd biblioteca-backend-postgresql
-\`\`\`
+`
+git clone https://github.com/Frankmolin/Back-2-Biblioteca-CCN-BPAF
+cd Back-2-Biblioteca-CCN-BPAF
+`
 
 2. **Instalar dependencias**
-\`\`\`bash
+`
 npm install
-\`\`\`
+`
 
-3. **Configurar PostgreSQL**
-\`\`\`bash
-# Crear base de datos
-createdb biblioteca_db
-
-# O usando psql
-psql -U postgres
-CREATE DATABASE biblioteca_db;
-\`\`\`
-
-4. **Configurar variables de entorno**
-\`\`\`bash
-cp .env.example .env
-\`\`\`
+ **Configurar variables de entorno**
+`
+ .env
+`
 
 Edita el archivo `.env`:
-\`\`\`env
-PORT=3000
-DB_HOST=localhost
+`
+
+PORT=3001
+
+
+DB_HOST=ep-spring-dust-acd6ue9r-pooler.sa-east-1.aws.neon.tech
 DB_PORT=5432
-DB_NAME=biblioteca_db
-DB_USER=tu_usuario
-DB_PASSWORD=tu_password
-DB_SSL=false
-JWT_SECRET=tu_secreto_jwt_super_seguro
+DB_NAME=bibliotecaDB
+DB_USER=bibliotecaDB_owner
+DB_PASSWORD=npg_tpRXBLT84Fgy
+DB_SSL=true
+
+
+JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRES_IN=7d
+
+
 NODE_ENV=development
+
+
 UPLOAD_DIR=uploads
-\`\`\`
+`
 
-5. **Ejecutar migraciones**
-\`\`\`bash
-npm run migrate
-\`\`\`
 
-## 🚀 Uso
 
-### Desarrollo
-\`\`\`bash
-# Generar documentación Swagger y iniciar servidor
-npm run swagger-dev
-
-# Solo iniciar servidor
-npm run dev
-
-# Solo generar Swagger
-npm run swagger
-
-# Ejecutar migraciones
-npm run migrate
-\`\`\`
-
-### Producción
-\`\`\`bash
-npm start
-\`\`\`
 
 ## 📚 API Endpoints
 
@@ -124,10 +99,7 @@ npm start
 
 ## 📖 Documentación
 
-La documentación completa está disponible en:
-\`\`\`
-http://localhost:3000/api-docs
-\`\`\`
+La documentación completa está disponible en: http://localhost:3001/api-docs
 
 ## 🗄️ Base de Datos
 
@@ -154,46 +126,10 @@ http://localhost:3000/api-docs
 - **Límite de tamaño**: 5MB
 - **URLs públicas** servidas por Express
 
-## 🔐 Autenticación
-
-### Credenciales por defecto:
-\`\`\`bash
-# Administrador
-Email: admin@biblioteca.com
-Password: admin123
-
-# Usuario normal
-Email: usuario@biblioteca.com  
-Password: usuario123
-\`\`\`
-
-### Ejemplo de uso:
-\`\`\`bash
-# Registro
-curl -X POST http://localhost:3000/api/auth/registro \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "nuevo@ejemplo.com",
-    "password": "contraseña123",
-    "nombre": "Nuevo Usuario"
-  }'
-
-# Login
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@biblioteca.com",
-    "password": "admin123"
-  }'
-
-# Usar token
-curl -X GET http://localhost:3000/api/usuarios/perfil \
-  -H "Authorization: Bearer TU_TOKEN_JWT"
-\`\`\`
 
 ## 📁 Estructura del Proyecto
 
-\`\`\`
+`
 biblioteca-backend-postgresql/
 ├── app.js                    # Servidor principal
 ├── swagger.js               # Configuración Swagger
@@ -219,33 +155,8 @@ biblioteca-backend-postgresql/
 └── uploads/                # Directorio de archivos subidos
     ├── eventos/
     └── funciones/
-\`\`\`
+`
 
-## 🔧 Configuración Avanzada
-
-### Pool de Conexiones PostgreSQL:
-\`\`\`javascript
-{
-  max: 20,                    // Máximo conexiones
-  idleTimeoutMillis: 30000,   // Timeout inactividad
-  connectionTimeoutMillis: 2000 // Timeout conexión
-}
-\`\`\`
-
-### Variables de entorno disponibles:
-\`\`\`env
-PORT=3000                     # Puerto del servidor
-DB_HOST=localhost            # Host de PostgreSQL
-DB_PORT=5432                 # Puerto de PostgreSQL
-DB_NAME=biblioteca_db        # Nombre de la base de datos
-DB_USER=usuario              # Usuario de PostgreSQL
-DB_PASSWORD=password         # Contraseña de PostgreSQL
-DB_SSL=false                 # Usar SSL (true/false)
-JWT_SECRET=secreto           # Secreto para JWT
-JWT_EXPIRES_IN=7d            # Expiración del token
-NODE_ENV=development         # Entorno
-UPLOAD_DIR=uploads           # Directorio de uploads
-\`\`\`
 
 ## 🛡️ Seguridad
 
@@ -257,53 +168,6 @@ UPLOAD_DIR=uploads           # Directorio de uploads
 - **SQL injection** prevenido con queries parametrizadas
 - **Verificación de roles** y permisos
 - **Validación de tipos de archivo**
-
-## 📊 Ejemplos de Queries SQL
-
-### Crear evento:
-\`\`\`sql
-INSERT INTO eventos (id, titulo, descripcion, fecha, imagen_url, created_by) 
-VALUES ($1, $2, $3, $4, $5, $6) 
-RETURNING *
-\`\`\`
-
-### Obtener votación con resultados:
-\`\`\`sql
-SELECT v.*, u.nombre as creador_nombre
-FROM votaciones v
-LEFT JOIN usuarios u ON v.created_by = u.id
-WHERE v.id = $1
-\`\`\`
-
-### Registrar voto (con transacción):
-\`\`\`sql
-BEGIN;
--- Verificar votación activa
--- Verificar si usuario ya votó
--- Insertar voto
-INSERT INTO votos (id, votacion_id, usuario_id, opcion) 
-VALUES ($1, $2, $3, $4);
-COMMIT;
-\`\`\`
-
-## 🚨 Manejo de Errores
-
-### Códigos de estado HTTP:
-- `200` - Éxito
-- `201` - Creado exitosamente
-- `400` - Datos inválidos
-- `401` - No autenticado
-- `403` - Sin permisos
-- `404` - No encontrado
-- `500` - Error interno del servidor
-
-### Formato de respuesta de error:
-\`\`\`json
-{
-  "error": "Tipo de error",
-  "message": "Descripción detallada del error"
-}
-\`\`\`
 
 ## 📦 Dependencias Principales
 
@@ -318,17 +182,7 @@ COMMIT;
 - **cors** - Configuración CORS
 - **uuid** - Generación de UUIDs
 
-## 🔄 Migraciones
 
-### Ejecutar migraciones:
-\`\`\`bash
-npm run migrate
-\`\`\`
-
-### Crear nueva migración:
-1. Crear archivo SQL en `scripts/`
-2. Actualizar `migrate.js` si es necesario
-3. Ejecutar migración
 
 ## 🤝 Contribución
 

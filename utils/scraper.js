@@ -27,6 +27,18 @@ async function buscarLibros(q, idx = '') {
             let fecha = fila.querySelector('.results_summary.date')?.textContent?.replace(/Fecha:/, '').trim() || '';
             let disponibilidad = fila.querySelector('.results_summary .label + span')?.textContent?.trim() || '';
 
+            // Extraer imagen de la portada
+            const coverDiv = fila.querySelector('.coverimages');
+            let imagen = '';
+            if (coverDiv) {
+                // Busca el <img> dentro de <span id^="local-thumbnail">
+                const localImg = coverDiv.querySelector('span[id^="local-thumbnail"] img');
+                if (localImg) {
+                    let src = localImg.getAttribute('src');
+                    imagen = src.startsWith('/') ? 'http://0197.bepe.ar' + src : src;
+                }
+            }
+
             // Limpieza de campos
             titulo = titulo.replace(/\s+\/$/, '').replace(/\s+/g, ' ').trim();
             autor = autor.replace(/\s+/g, ' ').trim();
@@ -40,7 +52,8 @@ async function buscarLibros(q, idx = '') {
                 autor,
                 publicacion,
                 fecha,
-                disponibilidad
+                disponibilidad,
+                imagen
             });
         });
 
