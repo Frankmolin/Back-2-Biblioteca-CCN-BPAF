@@ -1,23 +1,48 @@
-# Sistema de Biblioteca - Backend API con PostgreSQL
+# 📚 Sistema de Biblioteca - Backend API con PostgreSQL
 
-Backend completo para sistema de gestión de biblioteca desarrollado con Node.js, Express, PostgreSQL y JWT.
+Backend completo para un sistema de gestión de biblioteca, desarrollado con **Node.js**, **Express**, **PostgreSQL** y autenticación **JWT**, diseñado para ser seguro, escalable y fácilmente mantenible.
+
+---
+
+## 🗂️ Tabla de Contenidos
+
+- [Características](#-características)
+- [Requisitos](#-requisitos)
+- [Instalación](#-instalación)
+- [Configuración](#-configuración)
+- [Uso](#-uso)
+- [API Endpoints](#-api-endpoints)
+- [Documentación](#-documentación)
+- [Base de Datos](#-base-de-datos)
+- [Gestión de Imágenes](#-gestión-de-imágenes)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Seguridad](#-seguridad)
+- [Dependencias](#-dependencias-principales)
+- [Contribución](#-contribución)
+- [Solución de Problemas](#-solución-de-problemas)
+- [Licencia](#-licencia)
+
+---
 
 ## 🚀 Características
 
-- **Autenticación JWT** con roles de usuario (admin/usuario)
-- **Base de datos PostgreSQL** con queries SQL directos
-- **Almacenamiento local de imágenes** con Multer
-- **Documentación automática** con Swagger
-- **Validación de datos** con Joi
-- **Pool de conexiones** para mejor rendimiento
-- **Transacciones SQL** para operaciones críticas
-- **Arquitectura modular** y escalable
+- Autenticación **JWT** con verificación de roles (`admin`, `usuario`)
+- **PostgreSQL** con queries SQL directos y conexión optimizada
+- Subida y almacenamiento local de imágenes con **Multer**
+- Documentación automática con **Swagger**
+- Validación de datos robusta con **Joi**
+- Soporte de transacciones SQL para operaciones críticas
+- Arquitectura modular y escalable
+
+---
 
 ## 📋 Requisitos
 
-- Node.js >= 14.x
-- PostgreSQL >= 12.x
-- npm o yarn
+- **Node.js** `>=14.x`
+- **PostgreSQL** `>=12.x`
+- Gestor de paquetes: `npm` o `yarn`
+
+---
 
 ## 🛠️ Instalación
 
@@ -71,31 +96,33 @@ UPLOAD_DIR=uploads
 - `POST /api/auth/login` - Iniciar sesión
 
 ### Usuarios
-- `GET /api/usuarios/perfil` - Obtener perfil (requiere auth)
+- `GET /api/usuarios/perfil` - Obtener perfil (auth)
 - `GET /api/usuarios` - Listar usuarios (solo admin)
 - `PATCH /api/usuarios/:id/rol` - Cambiar rol (solo admin)
 
 ### Eventos
-- `GET /api/eventos` - Listar eventos
-- `GET /api/eventos/:id` - Obtener evento
-- `POST /api/eventos` - Crear evento (solo admin, con imagen)
-- `PUT /api/eventos/:id` - Actualizar evento (solo admin)
-- `DELETE /api/eventos/:id` - Eliminar evento (solo admin)
+- `GET /api/eventos`
+- `GET /api/eventos/:id`
+- `POST /api/eventos` (admin, con imagen)
+- `PUT /api/eventos/:id` (admin)
+- `DELETE /api/eventos/:id` (admin)
 
 ### Funciones
-- `GET /api/funciones` - Listar funciones
-- `GET /api/funciones/:id` - Obtener función
-- `POST /api/funciones` - Crear función (solo admin, con imagen)
-- `PUT /api/funciones/:id` - Actualizar función (solo admin)
-- `DELETE /api/funciones/:id` - Eliminar función (solo admin)
+- `GET /api/funciones`
+- `GET /api/funciones/:id`
+- `POST /api/funciones` (admin, con imagen)
+- `PUT /api/funciones/:id` (admin)
+- `DELETE /api/funciones/:id` (admin)
 
 ### Votaciones
-- `GET /api/votaciones` - Listar votaciones
-- `GET /api/votaciones/:id` - Obtener votación con resultados
-- `POST /api/votaciones` - Crear votación (solo admin)
-- `POST /api/votaciones/:id/votar` - Votar (requiere auth)
-- `PUT /api/votaciones/:id` - Actualizar votación (solo admin)
-- `DELETE /api/votaciones/:id` - Eliminar votación (solo admin)
+- `GET /api/votaciones`
+- `GET /api/votaciones/:id`
+- `POST /api/votaciones` (admin)
+- `POST /api/votaciones/:id/votar` (auth)
+- `PUT /api/votaciones/:id` (admin)
+- `DELETE /api/votaciones/:id` (admin)
+
+---
 
 ## 📖 Documentación
 
@@ -103,19 +130,23 @@ La documentación completa está disponible en: http://localhost:3001/api-docs
 
 ## 🗄️ Base de Datos
 
-### Estructura de tablas:
-- **usuarios** - Información de usuarios y roles
-- **eventos** - Eventos de la biblioteca
-- **funciones** - Funciones teatrales/culturales
-- **votaciones** - Votaciones activas
-- **votos** - Registro de votos individuales
+### Tablas
 
-### Características de la BD:
-- **UUIDs** como claves primarias
-- **Índices** optimizados para consultas frecuentes
-- **Triggers** para actualización automática de timestamps
-- **Constraints** para integridad de datos
-- **Transacciones** para operaciones críticas
+- `usuarios`: roles, datos de login
+- `eventos`: eventos culturales
+- `funciones`: funciones teatrales
+- `votaciones`: temas abiertos a votación
+- `votos`: votos individuales
+
+### Características
+
+- UUIDs como claves primarias
+- Índices optimizados
+- Triggers para timestamps automáticos
+- Constraints de integridad
+- Soporte de transacciones
+
+---
 
 ## 🖼️ Gestión de Imágenes
 
@@ -131,28 +162,28 @@ La documentación completa está disponible en: http://localhost:3001/api-docs
 
 `
 biblioteca-backend-postgresql/
-├── app.js                    # Servidor principal
-├── swagger.js               # Configuración Swagger
-├── package.json             # Dependencias
-├── .env.example            # Variables de entorno ejemplo
+├── app.js
+├── swagger.js
+├── .env.example
+├── package.json
 ├── config/
-│   └── database.js         # Configuración PostgreSQL
+│   └── database.js
 ├── middlewares/
-│   └── auth.js             # Middlewares de autenticación
+│   └── auth.js
 ├── routes/
-│   ├── auth.js             # Rutas de autenticación
-│   ├── usuarios.js         # Rutas de usuarios
-│   ├── eventos.js          # Rutas de eventos
-│   ├── funciones.js        # Rutas de funciones
-│   └── votaciones.js       # Rutas de votaciones
+│   ├── auth.js
+│   ├── usuarios.js
+│   ├── eventos.js
+│   ├── funciones.js
+│   └── votaciones.js
 ├── utils/
-│   ├── validation.js       # Esquemas de validación
-│   └── fileUpload.js       # Utilidades de archivos
+│   ├── validation.js
+│   └── fileUpload.js
 ├── scripts/
-│   ├── migrate.js          # Script de migraciones
-│   ├── create-tables.sql   # Script creación tablas
-│   └── seed-data.sql       # Datos de ejemplo
-└── uploads/                # Directorio de archivos subidos
+│   ├── migrate.js
+│   ├── create-tables.sql
+│   └── seed-data.sql
+└── uploads/
     ├── eventos/
     └── funciones/
 `
@@ -186,18 +217,20 @@ biblioteca-backend-postgresql/
 
 ## 🤝 Contribución
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
+1. Haz un fork del proyecto
+2. Crea tu rama (`git checkout -b feature/NuevaFuncionalidad`)
+3. Haz commit (`git commit -m 'Agrega nueva funcionalidad'`)
+4. Push a tu rama (`git push origin feature/NuevaFuncionalidad`)
 5. Abre un Pull Request
 
+---
 
+## 🧩 Solución de Problemas
 
-Si tienes problemas:
-1. Verifica que PostgreSQL esté corriendo
-2. Revisa las variables de entorno en `.env`
-3. Ejecuta las migraciones con `npm run migrate`
-4. Revisa los logs del servidor para errores específicos
-5. Consulta la documentación en `/api-docs`
+- ✅ PostgreSQL está corriendo correctamente
+- ✅ Variables de entorno `.env` configuradas
+- ✅ Ejecuta migraciones: `npm run migrate`
+- ✅ Revisa logs del servidor (`console.log`, errores)
+- ✅ Consulta la documentación Swagger en `/api-docs`
 
+---
